@@ -5,7 +5,6 @@ const mySQLPool = mysql.createPool({
     user: 'root',
     password: 'root',
     database: 'students_db',
-
 })
 
 module.exports = mySQLPool;

@@ -1,6 +1,8 @@
 const mySQLPool = require("../../config/db");
+const { handlerError, sendResponse } = require("../../utils/responseHandler");
 
 //! GET all students
+/*
 const getAllStudents = async (req, res) => {
   try {
     const data = await mySQLPool.query("SELECT * FROM students");
@@ -26,7 +28,27 @@ const getAllStudents = async (req, res) => {
     });
   }
 };
+*/
+const getAllStudents = async (req, res) => {
+  try {
+    const [data] = await mySQLPool.query("SELECT * FROM students");
+    if (data.length === 0) {
+      return sendResponse(res, 404, false, "No students found");
+    } else {
+      return sendResponse(
+        res,
+        200,
+        true,
+        "All students fetched successfully",
+        data
+      );
+    }
+  } catch (error) {
+    return handlerError(res, error, "Error while getting all students");
+  }
+};
 //! GET student by id
+/*
 const getSingleStudentById = async (req, res) => {
   try {
     const studentId = req.params.id;
@@ -57,6 +79,25 @@ const getSingleStudentById = async (req, res) => {
       success: false,
       message: "Internal Server Error",
     });
+  }
+};
+*/
+const getSingleStudentById = async (req, res) => {
+  try {
+    const studentId = req.params.id;
+    if(!studentId){
+      return sendResponse(res, 404, false, "Please provide/Invalid student id");
+    }else{
+      const [data] = await mySQLPool.query("SELECT * FROM students WHERE id=?", [studentId]);
+      if(data.length === 0){
+        return sendResponse(res, 404, false, "Student not found");
+      }else{
+        return sendResponse(res, 200, true, "Single student fetched successfully", data[0]);
+      }
+    }
+
+  } catch (error) {
+    return handlerError(res, error, "Internal Server Error");
   }
 };
 
