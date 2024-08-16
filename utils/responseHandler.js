@@ -1,16 +1,16 @@
-const sendResponse = (res, statusCode, success, message, data = null) => {
+const sendResponse = (res, statusCode, success, message, data = null, total=null) => {
   const response = {
     success,
     message,
   };
   if (data !== null) {
-    response.total = Array.isArray(data) ? data.length : undefined;
+    response.total = total !== null ? total : Array.isArray(data) ? data.length : undefined;
     response.data = data;
   }
   return res.status(statusCode).send(response);
 };
 
-const handlerError = (res, error, message = "Internal Server Error") => {
+const handleError = (res, error, message = "Internal Server Error") => {
   console.log(error);
   return res.status(500).send({
     success: false,
@@ -21,5 +21,7 @@ const handlerError = (res, error, message = "Internal Server Error") => {
 
 module.exports = {
   sendResponse,
-  handlerError,
+  handleError,
 };
+
+
