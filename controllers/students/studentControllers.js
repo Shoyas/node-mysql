@@ -14,7 +14,7 @@ const createNewStudent = async (req, res) => {
     }
     const { name, roll, className, fees, group } = req.body;
     //! Insert student's data into DB
-    const result = await mySQLPool.query(
+    await mySQLPool.query(
       "INSERT INTO students (name, roll,  className, fees, `group`) VALUES (?, ?, ?, ?, ?)",
       [name, roll, className, fees, group]
     );
@@ -44,33 +44,10 @@ const createNewStudent = async (req, res) => {
   }
 };
 
-/*
-//! GET all students
-const getAllStudents = async (req, res) => {
-  try {
-    const data = await mySQLPool.query("SELECT * FROM students");
-    console.log(data);
-    if (data.length === 0) {
-      return sendResponse(res, 404, false, "No students found");
-    } else {
-      return sendResponse(
-        res,
-        200,
-        true,
-        "All students fetched successfully",
-        data[0]
-      );
-    }
-  } catch (error) {
-    return handleError(res, error, "Error while getting all students");
-  }
-};
-*/
 //! GET all students with pagination & searching
 const getAllStudents = async (req, res) => {
   try {
     const { page = 1, limit = 10, searchTerm = "" } = req.query;
-    console.log("Search Term:", searchTerm);
     const [results] = await mySQLPool.query("SELECT * FROM students");
     if (results.length === 0) {
       return sendResponse(res, 404, false, "No students found");
@@ -83,8 +60,6 @@ const getAllStudents = async (req, res) => {
       "fees",
       "group",
     ]);
-    console.log("Searched data:", filteredData);
-
     //! Paginate the results
     const paginatedData = paginateResult(
       filteredData,

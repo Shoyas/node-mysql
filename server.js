@@ -3,6 +3,7 @@ const colors = require("colors");
 const morgan = require("morgan");
 const dotenv = require("dotenv");
 const mySQLPool = require("./config/db");
+const cors = require("cors");
 
 //! Configure dotenv
 dotenv.config();
@@ -15,9 +16,15 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
+app.use(cors());
+
+//! Student Routes Module
+const studentRoutes = require("./routes/students/studentRoutes");
+const userRoutes = require("./routes/users/userRoutes");
 
 //! Routes
-app.use("/api/v1/student", require("./routes/students/studentRoutes"));
+app.use("/api/v1/student", studentRoutes);
+app.use("/api/v1/user", userRoutes);
 
 app.get("/test", (req, res) => {
   res.status(200).send("<h1>Welcome from server</h1>");
