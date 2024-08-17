@@ -4,6 +4,11 @@ const morgan = require("morgan");
 const dotenv = require("dotenv");
 const mySQLPool = require("./config/db");
 const cors = require("cors");
+const { corsOptions } = require("./utils/corsOptions");
+
+//! Student Routes Module
+const studentRoutes = require("./routes/students/studentRoutes");
+const userRoutes = require("./routes/users/userRoutes");
 
 //! Configure dotenv
 dotenv.config();
@@ -16,11 +21,7 @@ const app = express();
 app.use(morgan("dev"));
 app.use(express.json());
 app.use(express.urlencoded({ extended: false }));
-app.use(cors());
-
-//! Student Routes Module
-const studentRoutes = require("./routes/students/studentRoutes");
-const userRoutes = require("./routes/users/userRoutes");
+app.use(cors(corsOptions));
 
 //! Routes
 app.use("/api/v1/student", studentRoutes);
