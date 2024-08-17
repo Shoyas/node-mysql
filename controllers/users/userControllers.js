@@ -77,26 +77,32 @@ const login = async (req, res) => {
     if (user.length === 0) {
       return sendResponse(res, 404, false, "User not found");
     }
+    const fetchedUser = user[0];
     //! Check if password is correct
-    const isPasswordCorrect = await bcrypt.compare(password, user[0].password);
+    const isPasswordCorrect = await bcrypt.compare(
+      password,
+      fetchedUser.password
+    );
     if (!isPasswordCorrect) {
       return sendResponse(res, 400, false, "Invalid email or password");
     }
     //! Generate access token
     const accessToken = jwt.sign(
-      { userId: user[0].id },
+      { id: fetchedUser.id, email: fetchedUser.email, role: fetchedUser.role },
       process.env.ACCESS_TOKEN_SECRET,
-      { expiresIn: process.env.ACCESS_TOKEN_SECRET }
+      { expiresIn: process.env.ACCESS_TOKEN_EXPIRED_IN }
     );
     //! Generate refresh token
     const refreshToken = jwt.sign(
-      { userId: user[0].id },
+      { id: fetchedUser.id },
       process.env.REFRESH_TOKEN_SECRET,
-      { expiresIn: process.env.REFRESH_TOKEN_SECRET }
+      { expiresIn: process.env.REFRESH_TOKEN_EXPIRED_IN }
     );
 
     const responseData = {
       message: "Login successful",
+      name: fetchedUser.name,
+      role: fetchedUser.role,
       accessToken,
       refreshToken,
     };
