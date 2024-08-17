@@ -1,5 +1,7 @@
 const mySQLPool = require("../../config/db");
+const { paginateResult } = require("../../utils/pagination");
 const { handleError, sendResponse } = require("../../utils/responseHandler");
+const { searchResult } = require("../../utils/searching");
 const { validationFields } = require("../../utils/validation");
 
 //! Create New Student
@@ -42,6 +44,7 @@ const createNewStudent = async (req, res) => {
   }
 };
 
+/*
 //! GET all students
 const getAllStudents = async (req, res) => {
   try {
@@ -62,6 +65,44 @@ const getAllStudents = async (req, res) => {
     return handleError(res, error, "Error while getting all students");
   }
 };
+*/
+//! GET all students with pagination & searching
+const getAllStudents = async (req, res) => {
+  try {
+    const { page = 1, limit = 10, searchTerm = "" } = req.query;
+    console.log("Search Term:", searchTerm);
+    const [results] = await mySQLPool.query("SELECT * FROM students");
+    if (results.length === 0) {
+      return sendResponse(res, 404, false, "No students found");
+    }
+    //! Search the result
+    const filteredData = searchResult(results, searchTerm, [
+      "name",
+      "roll",
+      "className",
+      "fees",
+      "group",
+    ]);
+    console.log("Searched data:", filteredData);
+
+    //! Paginate the results
+    const paginatedData = paginateResult(
+      filteredData,
+      parseInt(page),
+      parseInt(limit)
+    );
+    return sendResponse(
+      res,
+      200,
+      true,
+      "All Students fetched successfully",
+      paginatedData
+    );
+  } catch (error) {
+    return handleError(res, error, "Internal Server Error");
+  }
+};
+
 //! GET student by id
 const getSingleStudentById = async (req, res) => {
   try {
