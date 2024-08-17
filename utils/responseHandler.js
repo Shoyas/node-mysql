@@ -5,7 +5,7 @@ const sendResponse = (res, statusCode, success, message, data = null, total=null
   };
   if (data !== null) {
     response.total = total !== null ? total : Array.isArray(data) ? data.length : undefined;
-    response.data = data;
+    response.data = data; 
   }
   return res.status(statusCode).send(response);
 };
